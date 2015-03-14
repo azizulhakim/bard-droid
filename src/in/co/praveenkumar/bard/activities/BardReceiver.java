@@ -1,11 +1,11 @@
 package in.co.praveenkumar.bard.activities;
 
-import com.android.future.usb.UsbAccessory;
-import com.android.future.usb.UsbManager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.usb.UsbAccessory;
+import android.hardware.usb.UsbManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,7 +16,8 @@ public class BardReceiver extends BroadcastReceiver {
 
 		String action = intent.getAction();
 		if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(action)) {
-			UsbAccessory accessory = UsbManager.getAccessory(intent);
+			UsbAccessory accessory = (UsbAccessory)intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
+			//UsbAccessory accessory = UsbManager.getAccessory(intent);
 			Log.d("USB", "Attached!");
 			Toast.makeText(context, "Attached", Toast.LENGTH_LONG).show();
 			if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,
