@@ -4,6 +4,7 @@ import in.co.praveenkumar.bard.graphics.Frame;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.PendingIntent;
@@ -39,6 +40,7 @@ public abstract class USBControl extends Thread {
 	boolean connected = false;
 	private ParcelFileDescriptor mFileDescriptor;
 	private FileInputStream input;
+	public static FileOutputStream mOutputStream = null;;
 
 	// Receiver for connect/disconnect events
 	BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
@@ -119,23 +121,27 @@ public abstract class USBControl extends Thread {
 
 			public void run() {
 				while (running) {
-					byte[] msg = new byte[4098];
+					byte[] msg = new byte[4100];
 					try {
 						// Handle incoming messages
 						while (input != null && input.read(msg) != -1
 								&& running) {
 							// receive(msg);
 							System.out.println("Read USB data");
-							int pageIndex = (int) (msg[0] & 0x0000000ff)
-									+ (int) (msg[1] << 8 & 0x0000ff00);
-
-							System.out.println("Page index : " + pageIndex);
-
-							// Update frame data
-							int framePos = pageIndex * 4096;
-							if ((framePos - (msg.length - 2)) <= Frame.FRAME_LENGTH) {
-								Frame.frameBuffer.position(framePos);
-								Frame.frameBuffer.put(msg, 2, msg.length - 2);
+							int id = (int)(msg[0] & 0x000000ff);
+							
+							if (id == 1){
+								int pageIndex = (int) (msg[1] & 0x0000000ff)
+										+ (int) (msg[2] << 8 & 0x0000ff00);
+	
+								System.out.println("Page index : " + pageIndex);
+	
+								// Update frame data
+								int framePos = pageIndex * 4096;
+								if ((framePos - (msg.length - 2)) <= Frame.FRAME_LENGTH) {
+									Frame.frameBuffer.position(framePos);
+									Frame.frameBuffer.put(msg, 4, msg.length - 4);
+								}
 							}
 						}
 					} catch (final Exception e) {
@@ -163,6 +169,7 @@ public abstract class USBControl extends Thread {
 		if (mFileDescriptor != null) {
 			FileDescriptor fd = mFileDescriptor.getFileDescriptor();
 			input = new FileInputStream(fd);
+			mOutputStream = new FileOutputStream(fd);
 		}
 		this.start();
 		onConnected();
