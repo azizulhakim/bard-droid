@@ -1,6 +1,8 @@
 package in.co.praveenkumar.bard.io;
 
+import in.co.praveenkumar.bard.activities.MainActivity;
 import in.co.praveenkumar.bard.graphics.Frame;
+import in.co.praveenkumar.bard.utils.Globals;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -121,7 +123,7 @@ public abstract class USBControl extends Thread {
 
 			public void run() {
 				while (running) {
-					byte[] msg = new byte[4100];
+					byte[] msg = new byte[Globals.DATA_PACKET_SIZE]; //new byte[4100];
 					try {
 						// Handle incoming messages
 						while (input != null && input.read(msg) != -1
@@ -130,7 +132,7 @@ public abstract class USBControl extends Thread {
 							System.out.println("Read USB data");
 							int id = (int)(msg[0] & 0x000000ff);
 							
-							if (id == 1){
+							if (id == Globals.DATA_VIDEO){
 								int pageIndex = (int) (msg[1] & 0x0000000ff)
 										+ (int) (msg[2] << 8 & 0x0000ff00);
 	
