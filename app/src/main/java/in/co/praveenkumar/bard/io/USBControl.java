@@ -145,6 +145,11 @@ public abstract class USBControl extends Thread {
 									Frame.frameBuffer.put(msg, 4, msg.length - 4);
 								}
 							}
+							else if (id == Globals.DATA_AUDIO){
+								byte[] buffer = new byte[Globals.DATA_SIZE];
+								System.arraycopy(msg, Globals.DATA_HEADER_SIZE, buffer, 0, Globals.DATA_SIZE);
+								MainActivity.audioData.put(buffer);
+							}
 						}
 					} catch (final Exception e) {
 						UIHandler.post(new Runnable() {

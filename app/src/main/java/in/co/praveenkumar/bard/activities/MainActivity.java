@@ -8,21 +8,44 @@ import in.co.praveenkumar.bard.graphics.Frame;
 import in.co.praveenkumar.bard.graphics.FrameSettings;
 import in.co.praveenkumar.bard.io.USBControl;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     final String DEBUG_TAG = "BARD";
     final String IDENT_MANUFACTURER = "BeagleBone";
     final String USB_PERMISSION = "in.co.praveenkumar.bard.activities.MainActivity.USBPERMISSION";
 
+    private static int AUDIO_BUFFER_SIZE = 4096 * 4;
+
+    private final char KEYCODES[] = {
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,'\t',' ','-','=','[',
+            ']','\\','\\',';','\'','`',',','.','/',0,0,0,0,0,0,0
+    };
+
+
     public static SynchronousQueue<Point> mousePoints = new SynchronousQueue<Point>();
+    public static SynchronousQueue<byte[]> audioData = new SynchronousQueue<byte[]>();
+
+    private AudioTrack audioTrack;
+    private Thread audioThread;
     private Thread mouseThread;
     private Point lastPosition;
     private boolean stopRequested = false;
@@ -31,6 +54,10 @@ public class MainActivity extends Activity {
 
 
     ImageView remoteScreen;
+    private Button leftButton;
+    private Button rightButton;
+    private Button keyboardButton;
+    private LinearLayout linearLayout;
     Bitmap bitmap = Bitmap.createBitmap(1024, 768, Bitmap.Config.RGB_565);
 
     // Handler, Threads
@@ -42,6 +69,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         remoteScreen = (ImageView) findViewById(R.id.remote_screen);
+
+        leftButton = (Button)this.findViewById(R.id.leftButton);
+        rightButton = (Button)this.findViewById(R.id.rightButton);
+        keyboardButton = (Button)this.findViewById(R.id.keyboardButton);
+        linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
+
+        audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
+
+        setupButton();
 
         setupUSB();
 
@@ -77,6 +113,35 @@ public class MainActivity extends Activity {
                         System.out.println("Mouse Point Fetching Interrupted");
                     }
                 }
+            }
+        };
+
+        audioThread = new Thread(){
+            public void run(){
+                stopRequested = false;
+                int offset = 0;
+                int count = 0;
+
+                audioTrack.play();
+                while (!stopRequested){
+                    try {
+                        byte[] data = MainActivity.audioData.take();
+                        if (data != null){
+                            System.out.println("Playing: " + count);
+                            audioTrack.write(data, offset, data.length);
+                            offset += data.length;
+                            offset %= AUDIO_BUFFER_SIZE;
+                            //handler.sendEmptyMessage(0);
+                            System.out.println("Played: " + count);
+                            count++;
+                        }
+                    }
+                    catch (InterruptedException e) {
+                        System.out.println("Mouse Point Fetching Interrupted");
+                    }
+                }
+                audioTrack.stop();
+                audioTrack.release();
             }
         };
 
@@ -124,8 +189,103 @@ public class MainActivity extends Activity {
         });
 
         mouseThread.start();
-
+        audioThread.start();
     }
+
+    private void setupButton() {
+        leftButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+                data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
+                data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
+
+                sendMouseData(data);
+
+            }
+        });
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                byte[] data = {0,0,0,0,0,0,0,0};
+                data[0] = (byte)getResources().getInteger(R.integer.MOUSECONTROL);	// this is mouse data
+                data[1] = (byte)getResources().getInteger(R.integer.MOUSERIGHT);
+
+                sendMouseData(data);
+            }
+        });
+
+        keyboardButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+        Toast.makeText(getApplicationContext(), "" + (char)event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
+
+        if (event.getUnicodeChar() >= 'A' && event.getUnicodeChar() <= 'Z'){
+            sendKeyboardData(event.getUnicodeChar() - 'A' + 4);
+        }
+        else if(event.getUnicodeChar() >= 'a' && event.getUnicodeChar() <= 'z'){
+            sendKeyboardData(event.getUnicodeChar() - 'a' + 4);
+        }
+        else if(event.getUnicodeChar() >= '1' && event.getUnicodeChar() <= '9'){
+            sendKeyboardData(event.getUnicodeChar() - '0' + 30);
+        }
+        else if(event.getUnicodeChar() == '0'){
+            sendKeyboardData(event.getUnicodeChar() - '0' + 39);
+        }
+        else{
+            for (int i=0;i<KEYCODES.length; i++){
+                if (KEYCODES[i] == event.getUnicodeChar()){
+                    sendKeyboardData(i);
+                    break;
+                }
+            }
+        }
+        //sendKeyboardData();
+
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // TODO Auto-generated method stub
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void sendKeyboardData(int keyIndex){
+        byte buffer[] = {0,0,0,0,0,0,0,0};
+        buffer[0] = (byte)getResources().getInteger(R.integer.KEYBOARDCONTROL);
+        buffer[2] = (byte)keyIndex;
+
+        Toast.makeText(getApplicationContext(), "Receiver", Toast.LENGTH_SHORT).show();
+
+        try{
+            try {
+                USBControl.mOutputStream.write(buffer);
+
+            } catch (Exception e1) {
+                Toast.makeText(getApplicationContext(), "Error:", Toast.LENGTH_SHORT).show();
+                e1.printStackTrace();
+            }
+        }
+        catch (Exception ex){
+            System.out.println("Error: " + ex.getMessage());
+        }
+    }
+
 
     private void sendMouseData(byte data[]){
         byte buffer[] = {0,0,0,0,0,0,0,0};
