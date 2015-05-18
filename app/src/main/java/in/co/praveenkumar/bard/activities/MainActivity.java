@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -58,6 +59,7 @@ public class MainActivity extends Activity {
     private Button rightButton;
     private Button keyboardButton;
     private LinearLayout linearLayout;
+    public static EditText editText;
     Bitmap bitmap = Bitmap.createBitmap(1024, 768, Bitmap.Config.RGB_565);
 
     // Handler, Threads
@@ -74,6 +76,7 @@ public class MainActivity extends Activity {
         rightButton = (Button)this.findViewById(R.id.rightButton);
         keyboardButton = (Button)this.findViewById(R.id.keyboardButton);
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
+        editText = (EditText)this.findViewById(R.id.editText);
 
         audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
 
@@ -307,7 +310,7 @@ public class MainActivity extends Activity {
     }
 
     public void updateImage() {
-        System.out.println("setUpImage called");
+        //System.out.println("setUpImage called");
 
 		/*
 		 * -TODO- - Some strange thing here. Sometimes copyPixelsFromBuffer is

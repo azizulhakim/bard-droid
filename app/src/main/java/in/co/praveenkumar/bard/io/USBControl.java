@@ -3,11 +3,13 @@ package in.co.praveenkumar.bard.io;
 import in.co.praveenkumar.bard.activities.MainActivity;
 import in.co.praveenkumar.bard.graphics.Frame;
 import in.co.praveenkumar.bard.utils.Globals;
+import in.co.praveenkumar.bard.utils.RLE;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -19,6 +21,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.widget.Toast;
 
 /**
  * Configures a USB accessory and its input/output streams.
@@ -123,40 +126,129 @@ public abstract class USBControl extends Thread {
 
 			public void run() {
 				while (running) {
-					byte[] msg = new byte[Globals.DATA_PACKET_SIZE]; //new byte[4100];
 					try {
-						// Handle incoming messages
-						while (input != null && input.read(msg) != -1
-								&& running) {
-							// receive(msg);
-							System.out.println("Read USB data");
-							int id = (int)(msg[0] & 0x000000ff);
-							
-							if (id == Globals.DATA_VIDEO){
-								int pageIndex = (int) (msg[1] & 0x0000000ff)
-										+ (int) (msg[2] << 8 & 0x0000ff00);
-	
-								System.out.println("Page index : " + pageIndex);
-	
-								// Update frame data
-								int framePos = pageIndex * 4096;
-								if ((framePos - (msg.length - 2)) <= Frame.FRAME_LENGTH) {
-									Frame.frameBuffer.position(framePos);
-									Frame.frameBuffer.put(msg, 4, msg.length - 4);
+						if (Globals.RLE){
+
+							byte[] packetSizeBuffer = new byte[512];
+							byte[] totalByte = new byte[4098];
+							while (input != null && input.read(packetSizeBuffer, 0, 512) != -1
+									&& running) {
+
+								final int one = (int)packetSizeBuffer[2];
+								final int two = ((int)packetSizeBuffer[3]);
+								final int packetSize = ((int)packetSizeBuffer[2] & 0xFF) +
+														(((int)packetSizeBuffer[3] & 0xFF) << 8);
+								boolean rleUsed = (int)packetSizeBuffer[1] != 0;
+
+								final int remainingCount = packetSize - 508;
+								if (remainingCount < 0) continue;
+								if (remainingCount > 0 && remainingCount < 512){
+									byte[] remainingBuffer = new byte[512];
+									input.read(remainingBuffer, 0, 512);
+								}
+								else{
+									UIHandler.post(new Runnable() {
+										public void run() {
+											MainActivity.editText.setText(packetSize + "   " + remainingCount + "\n" + one + " " + two);
+										}
+									});
+
+									byte[] remainingBuffer = new byte[remainingCount];
+									input.read(remainingBuffer, 0, remainingCount);
+								}
+
+/*
+//								int packetSize = (int)(packetSizeBuffer[0] & 0x000000ff) +
+//										(int)(packetSizeBuffer[1] << 8 & 0x0000ff00) +
+//										(int)(packetSizeBuffer[1] << 16 & 0x00ff0000) +
+//										(int)(packetSizeBuffer[1] << 24 & 0xff000000);
+
+								int packetSize = (int)packetSizeBuffer[0] + ((int)packetSizeBuffer[1] << 8) +
+												((int)packetSizeBuffer[2] << 16) + ((int)packetSizeBuffer[3] << 24);
+
+								System.out.println("PacketSize = " + packetSize);
+
+								byte[] msg = new byte[Globals.DATA_SIZE];
+								byte[] packet = new byte[packetSize];
+								input.read(packet);
+
+								// receive(msg);
+								System.out.println("Read USB data");
+								int id = (int)(packet[0] & 0x000000ff);
+
+								if (id == Globals.DATA_VIDEO){
+									int pageIndex = (int) (packet[1] & 0x0000000ff)
+											+ (int) (packet[2] << 8 & 0x0000ff00);
+
+									System.out.println("Page index : " + pageIndex);
+
+									msg = RLE.decode(packet, 4);
+
+									// Update frame data
+									int framePos = pageIndex * 4096;
+									if ((framePos - (packet.length - 2)) <= Frame.FRAME_LENGTH) {
+										Frame.frameBuffer.position(framePos);
+										Frame.frameBuffer.put(msg, 0, msg.length);
+									}
+								}
+								else if (id == Globals.DATA_AUDIO){
+									byte[] buffer = new byte[Globals.DATA_SIZE];
+									System.arraycopy(packet, Globals.DATA_HEADER_SIZE, buffer, 0, Globals.DATA_SIZE);
+									MainActivity.audioData.put(buffer);
+								}
+								*/
+							}
+
+						}else{
+							byte[] msg = new byte[Globals.DATA_PACKET_SIZE]; //new byte[4100];
+							// Handle incoming messages
+							while (input != null && input.read(msg) != -1
+									&& running) {
+//
+//							int size = (int)(test[0] & 0x000000ff) + (int)(test[1] << 8 & 0x0000ff00) +
+//									(int)(test[1] << 16 & 0x00ff0000) + (int)(test[1] << 24 & 0xff000000);
+//
+							/*int size = (int)test[0] + ((int)test[1] << 8) + ((int)test[2] << 16) + ((int)test[3] << 24);
+
+							if (size != 4100) {
+								input.read(msg);
+								continue;
+							}*/
+
+								//input.read(msg);
+								// receive(msg);
+								System.out.println("Read USB data");
+								int id = (int)(msg[0] & 0x000000ff);
+
+								if (id == Globals.DATA_VIDEO){
+									int pageIndex = (int) (msg[1] & 0x0000000ff)
+											+ (int) (msg[2] << 8 & 0x0000ff00);
+
+									System.out.println("Page index : " + pageIndex);
+
+									// Update frame data
+									int framePos = pageIndex * 4096;
+									if ((framePos - (msg.length - 2)) <= Frame.FRAME_LENGTH) {
+										Frame.frameBuffer.position(framePos);
+										Frame.frameBuffer.put(msg, 4, msg.length - 4);
+									}
+								}
+								else if (id == Globals.DATA_AUDIO){
+									byte[] buffer = new byte[Globals.DATA_SIZE];
+									System.arraycopy(msg, Globals.DATA_HEADER_SIZE, buffer, 0, Globals.DATA_SIZE);
+									MainActivity.audioData.put(buffer);
 								}
 							}
-							else if (id == Globals.DATA_AUDIO){
-								byte[] buffer = new byte[Globals.DATA_SIZE];
-								System.arraycopy(msg, Globals.DATA_HEADER_SIZE, buffer, 0, Globals.DATA_SIZE);
-								MainActivity.audioData.put(buffer);
-							}
 						}
+
 					} catch (final Exception e) {
 						UIHandler.post(new Runnable() {
 							public void run() {
-								onNotify("USB Receive Failed " + e.toString()
-										+ "\n");
-								closeAccessory();
+								//MainActivity.editText.setText(e.toString());
+
+								//onNotify("USB Receive Failed " + e.toString()
+								//		+ "\n");
+								//closeAccessory();
 							}
 						});
 						running = false;

@@ -7,4 +7,7 @@ public class Globals {
 	public static int DATA_PACKET_SIZE = 4100;
 	public static int DATA_AUDIO = 1;
 	public static int DATA_VIDEO = 2;
+
+	public static boolean RLE = true;
+	public static int Length = 25;
 }
