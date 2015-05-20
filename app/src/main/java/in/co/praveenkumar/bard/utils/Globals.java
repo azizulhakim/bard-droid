@@ -9,5 +9,6 @@ public class Globals {
 	public static int DATA_VIDEO = 2;
 
 	public static boolean RLE = true;
-	public static int Length = 25;
+
+	public static final boolean DEBUG = true;
 }

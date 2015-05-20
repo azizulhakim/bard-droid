@@ -2,13 +2,16 @@ package in.co.praveenkumar.bard.io;
 
 import in.co.praveenkumar.bard.activities.MainActivity;
 import in.co.praveenkumar.bard.graphics.Frame;
+import in.co.praveenkumar.bard.utils.DebugDump;
 import in.co.praveenkumar.bard.utils.Globals;
 import in.co.praveenkumar.bard.utils.RLE;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 
 import android.app.PendingIntent;
@@ -44,7 +47,8 @@ public abstract class USBControl extends Thread {
 	private Thread controlListener;
 	boolean connected = false;
 	private ParcelFileDescriptor mFileDescriptor;
-	private FileInputStream input;
+	//private FileInputStream input;
+	private IUsbInputStream input;
 	public static FileOutputStream mOutputStream = null;;
 
 	// Receiver for connect/disconnect events
@@ -90,13 +94,19 @@ public abstract class USBControl extends Thread {
 
 		UsbAccessory mAccessory = (accessoryList == null ? null
 				: accessoryList[0]);
-		if (mAccessory != null) {
 
-			while (!mManager.hasPermission(mAccessory)) {
-				mManager.requestPermission(mAccessory, mPermissionIntent);
-			}
+		if (Globals.DEBUG){
 			openAccessory(mAccessory);
 
+		}else {
+			if (mAccessory != null) {
+
+				while (!mManager.hasPermission(mAccessory)) {
+					mManager.requestPermission(mAccessory, mPermissionIntent);
+				}
+				openAccessory(mAccessory);
+
+			}
 		}
 
 	}
@@ -125,51 +135,96 @@ public abstract class USBControl extends Thread {
 			boolean running = true;
 
 			public void run() {
+				DebugDump debugDump = new DebugDump();
+				int i = 0;
+				//debugDump.init();
+
 				while (running) {
 					try {
 						if (Globals.RLE){
 
-							byte[] packetSizeBuffer = new byte[512];
-							byte[] totalByte = new byte[4098];
+							byte[] packetSizeBuffer = new byte[4100];
+//							byte[] totalByte = null;
 							while (input != null && input.read(packetSizeBuffer, 0, 512) != -1
 									&& running) {
 
-								final int one = (int)packetSizeBuffer[2];
-								final int two = ((int)packetSizeBuffer[3]);
-								final int packetSize = ((int)packetSizeBuffer[2] & 0xFF) +
-														(((int)packetSizeBuffer[3] & 0xFF) << 8);
-								boolean rleUsed = (int)packetSizeBuffer[1] != 0;
+								final int one = (int)packetSizeBuffer[4];
+								final int two = ((int)packetSizeBuffer[5]);
 
-								final int remainingCount = packetSize - 508;
-								if (remainingCount < 0) continue;
+								final int payloadSize = ((int)packetSizeBuffer[4] & 0xFF) +
+														(((int)packetSizeBuffer[5] & 0xFF) << 8);
+
+								boolean rleUsed = (int)packetSizeBuffer[3] != 0;
+
+								final int remainingCount = payloadSize - 506;
+
 								if (remainingCount > 0 && remainingCount < 512){
-									byte[] remainingBuffer = new byte[512];
-									input.read(remainingBuffer, 0, 512);
+									input.read(packetSizeBuffer, 512, 512);
 								}
-								else{
+								else if (remainingCount > 512){
 									UIHandler.post(new Runnable() {
 										public void run() {
-											MainActivity.editText.setText(packetSize + "   " + remainingCount + "\n" + one + " " + two);
+											MainActivity.editText.setText(payloadSize + "   " + remainingCount + "\n" + one + " " + two);
+										}
+									});
+									input.read(packetSizeBuffer, 512, remainingCount);
+								}
+
+								final int pageIndex = ((int)packetSizeBuffer[2] & 0xFF) +
+										(((int)packetSizeBuffer[3] & 0xFF) << 8);
+
+								UIHandler.post(new Runnable() {
+									public void run() {
+										MainActivity.editText.setText("total bytes");
+									}
+								});
+
+								final int framePos = pageIndex * 4096;
+								try {
+									i++;
+
+									final byte[] totalByte = RLE.decode(packetSizeBuffer, 6, payloadSize + 6);
+
+//									if (Globals.DEBUG && i < 100) {
+//										debugDump.init();
+//										debugDump.dumpActualBuffer(packetSizeBuffer);
+//										debugDump.dumpRleDecodedPayload(totalByte);
+//										debugDump.close();
+//									}
+
+									UIHandler.post(new Runnable() {
+										public void run() {
+											MainActivity.editText.setText(totalByte.length + "");
 										}
 									});
 
-									byte[] remainingBuffer = new byte[remainingCount];
-									input.read(remainingBuffer, 0, remainingCount);
+									//int framePos = pageIndex * 4096;
+									if ((framePos - (totalByte.length)) <= Frame.FRAME_LENGTH) {
+										Frame.frameBuffer.position(framePos);
+										Frame.frameBuffer.put(totalByte, 0, totalByte.length);
+									}
+								}
+								catch (final Exception ex){
+									UIHandler.post(new Runnable() {
+										public void run() {
+											MainActivity.editText.setText(pageIndex + ex.getMessage());
+										}
+									});
 								}
 
 /*
-//								int packetSize = (int)(packetSizeBuffer[0] & 0x000000ff) +
+//								int payloadSize = (int)(packetSizeBuffer[0] & 0x000000ff) +
 //										(int)(packetSizeBuffer[1] << 8 & 0x0000ff00) +
 //										(int)(packetSizeBuffer[1] << 16 & 0x00ff0000) +
 //										(int)(packetSizeBuffer[1] << 24 & 0xff000000);
 
-								int packetSize = (int)packetSizeBuffer[0] + ((int)packetSizeBuffer[1] << 8) +
+								int payloadSize = (int)packetSizeBuffer[0] + ((int)packetSizeBuffer[1] << 8) +
 												((int)packetSizeBuffer[2] << 16) + ((int)packetSizeBuffer[3] << 24);
 
-								System.out.println("PacketSize = " + packetSize);
+								System.out.println("PacketSize = " + payloadSize);
 
 								byte[] msg = new byte[Globals.DATA_SIZE];
-								byte[] packet = new byte[packetSize];
+								byte[] packet = new byte[payloadSize];
 								input.read(packet);
 
 								// receive(msg);
@@ -244,16 +299,18 @@ public abstract class USBControl extends Thread {
 					} catch (final Exception e) {
 						UIHandler.post(new Runnable() {
 							public void run() {
-								//MainActivity.editText.setText(e.toString());
+								MainActivity.editText.setText(e.toString());
 
-								//onNotify("USB Receive Failed " + e.toString()
-								//		+ "\n");
-								//closeAccessory();
+								onNotify("USB Receive Failed " + e.toString()
+										+ "\n");
+								closeAccessory();
 							}
 						});
 						running = false;
 					}
 				}
+
+				debugDump.close();
 			}
 		});
 		controlListener.setDaemon(true);
@@ -264,11 +321,19 @@ public abstract class USBControl extends Thread {
 	// Sets up filestreams
 	private void openAccessory(UsbAccessory accessory) {
 		mAccessory = accessory;
-		mFileDescriptor = mManager.openAccessory(accessory);
-		if (mFileDescriptor != null) {
-			FileDescriptor fd = mFileDescriptor.getFileDescriptor();
-			input = new FileInputStream(fd);
-			mOutputStream = new FileOutputStream(fd);
+
+		if (Globals.DEBUG){
+			input = new DummyInputStream();
+		}
+		else {
+			mFileDescriptor = mManager.openAccessory(accessory);
+			if (mFileDescriptor != null) {
+				FileDescriptor fd = mFileDescriptor.getFileDescriptor();
+
+				//input = new FileInputStream(fd);
+				input = new UsbInputStream(fd);
+				mOutputStream = new FileOutputStream(fd);
+			}
 		}
 		this.start();
 		onConnected();
