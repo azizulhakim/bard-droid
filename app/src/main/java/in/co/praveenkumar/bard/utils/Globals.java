@@ -10,5 +10,5 @@ public class Globals {
 
 	public static boolean RLE = true;
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 }

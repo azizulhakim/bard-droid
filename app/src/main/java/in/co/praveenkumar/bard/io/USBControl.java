@@ -170,8 +170,8 @@ public abstract class USBControl extends Thread {
 									input.read(packetSizeBuffer, 512, remainingCount);
 								}
 
-								final int pageIndex = ((int)packetSizeBuffer[2] & 0xFF) +
-										(((int)packetSizeBuffer[3] & 0xFF) << 8);
+								final int pageIndex = ((int)packetSizeBuffer[1] & 0xFF) +
+										(((int)packetSizeBuffer[2] & 0xFF) << 8);
 
 								UIHandler.post(new Runnable() {
 									public void run() {
