@@ -7,6 +7,8 @@ import in.co.praveenkumar.bard.R;
 import in.co.praveenkumar.bard.graphics.Frame;
 import in.co.praveenkumar.bard.graphics.FrameSettings;
 import in.co.praveenkumar.bard.io.USBControl;
+import in.co.praveenkumar.bard.utils.Globals;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,6 +24,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -289,6 +292,24 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void onCheckboxClicked(View view) {
+        final byte buffer[] = {0,0,0,0,0,0,0,0};
+        buffer[0] = Globals.CONTROL_HEADER;
+        buffer[1] = Globals.DROP_FRAME;
+        boolean checked = ((CheckBox) view).isChecked();
+
+        if (checked){
+            buffer[2] = 0x04;
+        }else{
+            buffer[2] = 0x01;
+        }
+
+        new Thread(){
+            public void run(){
+                sendMouseData(buffer);
+            }
+        }.start();
+    }
 
     private void sendMouseData(byte data[]){
         byte buffer[] = {0,0,0,0,0,0,0,0};

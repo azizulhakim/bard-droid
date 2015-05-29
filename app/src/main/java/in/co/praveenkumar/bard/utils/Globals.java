@@ -8,7 +8,10 @@ public class Globals {
 	public static int DATA_AUDIO = 1;
 	public static int DATA_VIDEO = 2;
 
-	public static boolean RLE = true;
+	public static final boolean RLE = false;
+
+	public static final byte CONTROL_HEADER = 0x03;
+	public static final byte DROP_FRAME = 0x02;
 
 	public static final boolean DEBUG = false;
 }
