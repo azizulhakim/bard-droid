@@ -8,6 +8,7 @@ import in.co.praveenkumar.bard.graphics.Frame;
 import in.co.praveenkumar.bard.graphics.FrameSettings;
 import in.co.praveenkumar.bard.io.USBControl;
 import in.co.praveenkumar.bard.utils.Globals;
+import in.co.praveenkumar.bard.utils.InputControl;
 
 import android.app.Activity;
 import android.content.Context;
@@ -99,21 +100,11 @@ public class MainActivity extends Activity {
 
                 while (!stopRequested){
                     try {
-                        int i = 0;
-                        data[i++] = (byte)getResources().getInteger(R.integer.MOUSECONTROL);	// this is mouse data
-                        data[i++] = (byte)getResources().getInteger(R.integer.MOUSEMOVE);
-
                         Point point = MainActivity.mousePoints.take();
 
-                        data[i+1] = (byte) (point.x);// - lastPosition.x);
-                        data[i+3] = (byte) (point.y);// - lastPosition.y);
-                        data[i+0] = point.x < 0.0 ? (byte)1 : (byte)0;
-                        data[i+2] = point.y < 0.0 ? (byte)1 : (byte)0;
-                        data[i+1] = (byte) Math.abs(point.x);
-                        data[i+3] = (byte) Math.abs(point.y);
-                        lastPosition = point;
+                        data[InputControl.REL_X_INDEX] = (byte)point.x;
+                        data[InputControl.REL_Y_INDEX] = (byte)point.y;
 
-                        i += 2;
                         sendMouseData(data);
                     }
                     catch (InterruptedException e) {
@@ -157,14 +148,7 @@ public class MainActivity extends Activity {
 
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
-                    // Toast.makeText(getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
-
-                    byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
-                    data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
-                    data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
-
-                    sendMouseData(data);
-                    sendMouseData(data);
+                    mouseDoubleClick();
 
                     return super.onDoubleTap(e);
                 }
@@ -179,12 +163,7 @@ public class MainActivity extends Activity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    // Toast.makeText(getApplicationContext(), "Single Tap", Toast.LENGTH_SHORT).show();
-
-                    byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
-                    data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
-                    data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
-                    sendMouseData(data);
+                    mouseSingleClick(InputControl.BTN_LEFT);
 
                     return super.onSingleTapConfirmed(e);
                 }
@@ -243,11 +222,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
-                data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
-                data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
-
-                sendMouseData(data);
+                mouseSingleClick(InputControl.BTN_LEFT);
 
             }
         });
@@ -256,11 +231,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                byte[] data = {0,0,0,0,0,0,0,0};
-                data[0] = (byte)getResources().getInteger(R.integer.MOUSECONTROL);	// this is mouse data
-                data[1] = (byte)getResources().getInteger(R.integer.MOUSERIGHT);
-
-                sendMouseData(data);
+                mouseSingleClick(InputControl.BTN_RIGHT);
             }
         });
 
@@ -313,8 +284,10 @@ public class MainActivity extends Activity {
 
     private void sendKeyboardData(int keyIndex){
         byte buffer[] = {0,0,0,0,0,0,0,0};
-        buffer[0] = (byte)getResources().getInteger(R.integer.KEYBOARDCONTROL);
-        buffer[2] = (byte)keyIndex;
+        //buffer[0] = (byte)getResources().getInteger(R.integer.KEYBOARDCONTROL);
+        //buffer[2] = (byte)keyIndex;
+
+        buffer[InputControl.KEY_INDEX] = (byte)keyIndex;
 
         Toast.makeText(getApplicationContext(), "Receiver", Toast.LENGTH_SHORT).show();
 
@@ -368,6 +341,32 @@ public class MainActivity extends Activity {
         }
         catch (Exception ex){
         }
+    }
+
+    private void mouseDoubleClick(){
+        byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+
+        data[InputControl.MOUSE_BTN_INDEX] |= InputControl.BTN_LEFT;
+        sendMouseData(data);
+
+        data[InputControl.MOUSE_BTN_INDEX] = 0;
+        sendMouseData(data);
+
+        data[InputControl.MOUSE_BTN_INDEX] |= InputControl.BTN_LEFT;
+        sendMouseData(data);
+
+        data[InputControl.MOUSE_BTN_INDEX] = 0;
+        sendMouseData(data);
+    }
+
+    private void mouseSingleClick(int button){
+        byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+
+        data[InputControl.MOUSE_BTN_INDEX] |= button;
+        sendMouseData(data);
+
+        data[InputControl.MOUSE_BTN_INDEX] = 0;
+        sendMouseData(data);
     }
 
     public void updateImage() {
