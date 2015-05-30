@@ -18,6 +18,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -152,8 +153,47 @@ public class MainActivity extends Activity {
         };
 
         remoteScreen.setOnTouchListener(new OnTouchListener() {
+            private GestureDetector gestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
+
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    // Toast.makeText(getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
+
+                    byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+                    data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
+                    data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
+
+                    sendMouseData(data);
+                    sendMouseData(data);
+
+                    return super.onDoubleTap(e);
+                }
+                // implement here other callback methods like onFling, onScroll as necessary
+
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    // Toast.makeText(getApplicationContext(), "Single Tap Up", Toast.LENGTH_SHORT).show();
+                    return super.onSingleTapUp(e);
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    // Toast.makeText(getApplicationContext(), "Single Tap", Toast.LENGTH_SHORT).show();
+
+                    byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+                    data[0] = (byte) getResources().getInteger(R.integer.MOUSECONTROL);    // this is mouse data
+                    data[1] = (byte) getResources().getInteger(R.integer.MOUSELEFT);
+                    sendMouseData(data);
+
+                    return super.onSingleTapConfirmed(e);
+                }
+            });
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+
                 int eid = event.getAction();
                 switch (eid){
                     case MotionEvent.ACTION_DOWN:
