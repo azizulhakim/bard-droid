@@ -70,6 +70,9 @@ public class MainActivity extends Activity {
     // Handler, Threads
     private Handler UIHandler = new Handler();
 
+    private long oldTimeStamp = 0;
+    private boolean isDragging = false;
+
     // Activity Lifecycle
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,14 +99,17 @@ public class MainActivity extends Activity {
             public void run(){
                 stopRequested = false;
                 lastPosition = new Point(0, 0);
-                byte data[] = new byte[8];
 
                 while (!stopRequested){
                     try {
+                        byte data[] = new byte[8];
                         Point point = MainActivity.mousePoints.take();
 
                         data[InputControl.REL_X_INDEX] = (byte)point.x;
                         data[InputControl.REL_Y_INDEX] = (byte)point.y;
+
+                        if (isDragging)
+                            data[InputControl.MOUSE_BTN_INDEX] |= InputControl.BTN_LEFT;
 
                         sendMouseData(data);
                     }
@@ -129,8 +135,6 @@ public class MainActivity extends Activity {
                             audioTrack.write(data, offset, data.length);
                             offset += data.length;
                             offset %= AUDIO_BUFFER_SIZE;
-                            //handler.sendEmptyMessage(0);
-                            System.out.println("Played: " + count);
                             count++;
                         }
                     }
@@ -148,17 +152,31 @@ public class MainActivity extends Activity {
 
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
-                    mouseDoubleClick();
+                    //mouseDoubleClick();
 
                     return super.onDoubleTap(e);
                 }
-                // implement here other callback methods like onFling, onScroll as necessary
-
 
                 @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    // Toast.makeText(getApplicationContext(), "Single Tap Up", Toast.LENGTH_SHORT).show();
-                    return super.onSingleTapUp(e);
+                public boolean onDoubleTapEvent(MotionEvent e) {
+                    int action = e.getAction();
+
+                    if (action == MotionEvent.ACTION_UP) {
+                        long newTimeStamp = e.getEventTime();
+
+                        long diff = newTimeStamp - oldTimeStamp;
+
+                        if (diff < 100) {
+                            isDragging = false;
+                            mouseDoubleClick();
+                        }
+
+                    } else if (action == MotionEvent.ACTION_DOWN) {
+                        isDragging = true;
+                        oldTimeStamp = e.getEventTime();
+                    }
+
+                    return super.onDoubleTapEvent(e);
                 }
 
                 @Override
@@ -174,7 +192,7 @@ public class MainActivity extends Activity {
                 gestureDetector.onTouchEvent(event);
 
                 int eid = event.getAction();
-                switch (eid){
+                switch (eid) {
                     case MotionEvent.ACTION_DOWN:
                         downx = event.getX();
                         downy = event.getY();
@@ -187,18 +205,17 @@ public class MainActivity extends Activity {
 
                         //Toast.makeText(getApplicationContext(), "x=" + upx + "y=" + upy, Toast.LENGTH_SHORT).show();
 
-                        int x = (int)Math.ceil((double)(upx - downx));
-                        int y = (int)Math.ceil((double)(upy - downy));
+                        int x = (int) Math.ceil((double) (upx - downx));
+                        int y = (int) Math.ceil((double) (upy - downy));
 
                         if (Math.abs(x) > 0) downx = upx;
                         if (Math.abs(y) > 0) downy = upy;
 
-                        if ((Math.abs(x) > 0 || Math.abs(y) > 0) && mousePoints.size() < 1000);
+                        if ((Math.abs(x) > 0 || Math.abs(y) > 0) && mousePoints.size() < 1000) ;
                     {
-                        try{
+                        try {
                             mousePoints.add(new Point(x, y));
-                        }
-                        catch(Exception ex){
+                        } catch (Exception ex) {
 
                         }
                     }
@@ -284,8 +301,6 @@ public class MainActivity extends Activity {
 
     private void sendKeyboardData(int keyIndex){
         byte buffer[] = {0,0,0,0,0,0,0,0};
-        //buffer[0] = (byte)getResources().getInteger(R.integer.KEYBOARDCONTROL);
-        //buffer[2] = (byte)keyIndex;
 
         buffer[InputControl.KEY_INDEX] = (byte)keyIndex;
 
@@ -325,12 +340,6 @@ public class MainActivity extends Activity {
     }
 
     private void sendMouseData(byte data[]){
-        byte buffer[] = {0,0,0,0,0,0,0,0};
-
-        if (data.length < buffer.length){
-            //System.arraycopy(data, 0, buffer, 0, data.length);
-        }
-
         try{
             try {
                 USBControl.mOutputStream.write(data);
@@ -367,6 +376,8 @@ public class MainActivity extends Activity {
 
         data[InputControl.MOUSE_BTN_INDEX] = 0;
         sendMouseData(data);
+
+        isDragging = false;
     }
 
     public void updateImage() {
