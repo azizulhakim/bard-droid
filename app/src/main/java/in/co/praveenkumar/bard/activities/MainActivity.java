@@ -185,6 +185,12 @@ public class MainActivity extends Activity {
 
                     return super.onSingleTapConfirmed(e);
                 }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    mouseSingleClick(InputControl.BTN_RIGHT);
+                    super.onLongPress(e);
+                }
             });
 
             @Override
