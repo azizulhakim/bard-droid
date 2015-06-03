@@ -188,7 +188,9 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onLongPress(MotionEvent e) {
-                    mouseSingleClick(InputControl.BTN_RIGHT);
+                    if (!isDragging) {
+                        mouseSingleClick(InputControl.BTN_RIGHT);
+                    }
                     super.onLongPress(e);
                 }
             });
