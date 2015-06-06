@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/metaKeyPopupLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="14"
+        android:rowCount="2">
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f1"
+            custom:keyCodeIndex="@integer/F1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F1"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"
+            />
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f2"
+            custom:keyCodeIndex="@integer/F2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F2"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f3"
+            custom:keyCodeIndex="@integer/F3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F3"
+            android:layout_column="2"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f4"
+            custom:keyCodeIndex="@integer/F4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F4"
+            android:layout_column="3"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f5"
+            custom:keyCodeIndex="@integer/F5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F5"
+            android:layout_column="4"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f6"
+            custom:keyCodeIndex="@integer/F6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F6"
+            android:layout_column="5"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f7"
+            custom:keyCodeIndex="@integer/F7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F7"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f8"
+            custom:keyCodeIndex="@integer/F8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F8"
+            android:layout_column="1"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f9"
+            custom:keyCodeIndex="@integer/F9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F9"
+            android:layout_column="2"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f10"
+            custom:keyCodeIndex="@integer/F10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F10"
+            android:layout_column="3"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f11"
+            custom:keyCodeIndex="@integer/F11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F11"
+            android:layout_column="4"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/f12"
+            custom:keyCodeIndex="@integer/F2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="F12"
+            android:layout_column="5"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/esc"
+            custom:keyCodeIndex="@integer/ESC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ESC"
+            android:layout_column="6"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/ctrl"
+            custom:keyCodeIndex="@integer/CTRL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CTRL"
+            android:layout_column="7"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/insert"
+            custom:keyCodeIndex="@integer/INSERT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INSERT"
+            android:layout_column="8"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/home"
+            custom:keyCodeIndex="@integer/HOME"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HOME"
+            android:layout_column="9"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/pgup"
+            custom:keyCodeIndex="@integer/PgUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PgUp"
+            android:layout_column="10"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/upArrow"
+            custom:keyCodeIndex="@integer/UP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Up"
+            android:layout_column="12"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
+
+
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/tab"
+            custom:keyCodeIndex="@integer/TAB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TAB"
+            android:layout_column="6"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/alt"
+            custom:keyCodeIndex="@integer/ALT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ALT"
+            android:layout_column="7"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/delete"
+            custom:keyCodeIndex="@integer/DELETE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DELETE"
+            android:layout_column="8"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/end"
+            custom:keyCodeIndex="@integer/END"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="END"
+            android:layout_column="9"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/pgdn"
+            custom:keyCodeIndex="@integer/PgDn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PgDn"
+            android:layout_column="10"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/leftArrow"
+            custom:keyCodeIndex="@integer/LEFT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Left"
+            android:layout_column="11"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/downArrow"
+            custom:keyCodeIndex="@integer/DOWN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Down"
+            android:layout_column="12"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/rightArrow"
+            custom:keyCodeIndex="@integer/RIGHT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Right"
+            android:layout_column="13"
+            android:layout_row="1"
+            android:onClick="onMetaKeyClick"/>
+
+    </GridLayout>
+</LinearLayout>

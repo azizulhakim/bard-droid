@@ -14,13 +14,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -30,12 +33,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
     final String DEBUG_TAG = "BARD";
     final String IDENT_MANUFACTURER = "BeagleBone";
     final String USB_PERMISSION = "in.co.praveenkumar.bard.activities.MainActivity.USBPERMISSION";
+
 
     private static int AUDIO_BUFFER_SIZE = 4096 * 4;
 
@@ -58,7 +63,8 @@ public class MainActivity extends Activity {
     float downx, downy, upx, upy;
 
 
-
+    private LinearLayout activityLayout;
+    private PopupWindow metaKeyPopUp;
     ImageView remoteScreen;
     private Button leftButton;
     private Button rightButton;
@@ -85,6 +91,17 @@ public class MainActivity extends Activity {
         keyboardButton = (Button)this.findViewById(R.id.keyboardButton);
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         editText = (EditText)this.findViewById(R.id.editText);
+
+        activityLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupLayout = layoutInflater.inflate(R.layout.menu_layout, null);
+        
+        metaKeyPopUp = new PopupWindow(this);
+        metaKeyPopUp.setContentView(popupLayout);
+        metaKeyPopUp.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
+        metaKeyPopUp.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+        metaKeyPopUp.setFocusable(true);
+        //metaKeyPopUp.setBackgroundDrawable(new BitmapDrawable());
 
         audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
 
@@ -264,8 +281,10 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+
                 InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+                //sendKeyboardData(testKeyCodeIndex++);
 
             }
         });
@@ -273,6 +292,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // ToDo: Redisgn to make efficient
 
         Toast.makeText(getApplicationContext(), "" + (char)event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
 
@@ -305,6 +325,21 @@ public class MainActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // TODO Auto-generated method stub
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void onCustomClick(View view) {
+        int x = activityLayout.getWidth() - metaKeyPopUp.getWidth();
+        int y = activityLayout.getHeight() - metaKeyPopUp.getHeight();
+        metaKeyPopUp.showAtLocation(activityLayout, Gravity.NO_GRAVITY, x, y);
+    }
+
+    public void onMetaKeyClick(View view){
+        BeagleButton beagleButton = (BeagleButton)view;
+
+        if (beagleButton != null) {
+            int keyCodeIndex = beagleButton.getKeyCodeIndex();
+            sendKeyboardData(keyCodeIndex);
+        }
     }
 
     private void sendKeyboardData(int keyIndex){

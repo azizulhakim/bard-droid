@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="F1" type="integer">58</item>
+    <item name="F2" type="integer">59</item>
+    <item name="F3" type="integer">60</item>
+    <item name="F4" type="integer">61</item>
+    <item name="F5" type="integer">62</item>
+    <item name="F6" type="integer">63</item>
+    <item name="F7" type="integer">64</item>
+    <item name="F8" type="integer">65</item>
+    <item name="F9" type="integer">66</item>
+    <item name="F10" type="integer">67</item>
+    <item name="F11" type="integer">68</item>
+    <item name="F12" type="integer">69</item>
+
+    <item name="ESC" type="integer">0</item>
+    <item name="TAB" type="integer">0</item>
+
+    <item name="CTRL" type="integer">0</item>
+    <item name="ALT" type="integer">0</item>
+
+    <item name="INSERT" type="integer">73</item>
+    <item name="DELETE" type="integer">99</item>
+
+    <item name="HOME" type="integer">95</item>
+    <item name="END" type="integer">77</item>
+
+    <item name="PgUp" type="integer">75</item>
+    <item name="PgDn" type="integer">78</item>
+
+    <item name="LEFT" type="integer">74</item>
+    <item name="RIGHT" type="integer">79</item>
+    <item name="UP" type="integer">81</item>
+    <item name="DOWN" type="integer">82</item>
+</resources>

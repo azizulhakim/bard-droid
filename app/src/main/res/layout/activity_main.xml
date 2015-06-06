@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,6 +39,19 @@
                 android:layout_height="wrap_content"
                 android:text="@string/dropFrame"
                 android:onClick="onCheckboxClicked"/>
+
+            <Button android:id="@+id/popupButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MetaKeys"
+                android:onClick="onCustomClick"/>
+
+            <in.co.praveenkumar.bard.activities.BeagleButton
+                custom:keyCodeIndex="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Test"
+                android:onClick="onCustomClick"/>
         </LinearLayout>
 
 
