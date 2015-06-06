@@ -32,4 +32,6 @@
     <item name="RIGHT" type="integer">79</item>
     <item name="UP" type="integer">81</item>
     <item name="DOWN" type="integer">82</item>
+
+    <item name="ENTER" type="integer">88</item>
 </resources>

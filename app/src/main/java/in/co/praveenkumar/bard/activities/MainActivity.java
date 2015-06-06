@@ -12,6 +12,7 @@ import in.co.praveenkumar.bard.utils.InputControl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
@@ -296,6 +297,10 @@ public class MainActivity extends Activity {
 
         Toast.makeText(getApplicationContext(), "" + (char)event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
 
+        if (keyCode == KeyEvent.KEYCODE_ENTER){
+            Resources res = getResources();
+            sendKeyboardData(res.getInteger(R.integer.ENTER));
+        }
         if (event.getUnicodeChar() >= 'A' && event.getUnicodeChar() <= 'Z'){
             sendKeyboardData(event.getUnicodeChar() - 'A' + 4);
         }
