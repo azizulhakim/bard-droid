@@ -137,14 +137,12 @@ public abstract class USBControl extends Thread {
 			public void run() {
 				DebugDump debugDump = new DebugDump();
 				int i = 0;
-				//debugDump.init();
 
 				while (running) {
 					try {
 						if (Globals.RLE){
 
 							byte[] packetSizeBuffer = new byte[4100];
-//							byte[] totalByte = null;
 							while (input != null && input.read(packetSizeBuffer, 0, 512) != -1
 									&& running) {
 
@@ -185,20 +183,12 @@ public abstract class USBControl extends Thread {
 
 									final byte[] totalByte = RLE.decode(packetSizeBuffer, 6, payloadSize + 6);
 
-//									if (Globals.DEBUG && i < 100) {
-//										debugDump.init();
-//										debugDump.dumpActualBuffer(packetSizeBuffer);
-//										debugDump.dumpRleDecodedPayload(totalByte);
-//										debugDump.close();
-//									}
-
 									UIHandler.post(new Runnable() {
 										public void run() {
 											MainActivity.editText.setText(totalByte.length + "");
 										}
 									});
 
-									//int framePos = pageIndex * 4096;
 									if ((framePos - (totalByte.length)) <= Frame.FRAME_LENGTH) {
 										Frame.frameBuffer.position(framePos);
 										Frame.frameBuffer.put(totalByte, 0, totalByte.length);
@@ -211,47 +201,6 @@ public abstract class USBControl extends Thread {
 										}
 									});
 								}
-
-/*
-//								int payloadSize = (int)(packetSizeBuffer[0] & 0x000000ff) +
-//										(int)(packetSizeBuffer[1] << 8 & 0x0000ff00) +
-//										(int)(packetSizeBuffer[1] << 16 & 0x00ff0000) +
-//										(int)(packetSizeBuffer[1] << 24 & 0xff000000);
-
-								int payloadSize = (int)packetSizeBuffer[0] + ((int)packetSizeBuffer[1] << 8) +
-												((int)packetSizeBuffer[2] << 16) + ((int)packetSizeBuffer[3] << 24);
-
-								System.out.println("PacketSize = " + payloadSize);
-
-								byte[] msg = new byte[Globals.DATA_SIZE];
-								byte[] packet = new byte[payloadSize];
-								input.read(packet);
-
-								// receive(msg);
-								System.out.println("Read USB data");
-								int id = (int)(packet[0] & 0x000000ff);
-
-								if (id == Globals.DATA_VIDEO){
-									int pageIndex = (int) (packet[1] & 0x0000000ff)
-											+ (int) (packet[2] << 8 & 0x0000ff00);
-
-									System.out.println("Page index : " + pageIndex);
-
-									msg = RLE.decode(packet, 4);
-
-									// Update frame data
-									int framePos = pageIndex * 4096;
-									if ((framePos - (packet.length - 2)) <= Frame.FRAME_LENGTH) {
-										Frame.frameBuffer.position(framePos);
-										Frame.frameBuffer.put(msg, 0, msg.length);
-									}
-								}
-								else if (id == Globals.DATA_AUDIO){
-									byte[] buffer = new byte[Globals.DATA_SIZE];
-									System.arraycopy(packet, Globals.DATA_HEADER_SIZE, buffer, 0, Globals.DATA_SIZE);
-									MainActivity.audioData.put(buffer);
-								}
-								*/
 							}
 
 						}else{
@@ -259,19 +208,7 @@ public abstract class USBControl extends Thread {
 							// Handle incoming messages
 							while (input != null && input.read(msg) != -1
 									&& running) {
-//
-//							int size = (int)(test[0] & 0x000000ff) + (int)(test[1] << 8 & 0x0000ff00) +
-//									(int)(test[1] << 16 & 0x00ff0000) + (int)(test[1] << 24 & 0xff000000);
-//
-							/*int size = (int)test[0] + ((int)test[1] << 8) + ((int)test[2] << 16) + ((int)test[3] << 24);
 
-							if (size != 4100) {
-								input.read(msg);
-								continue;
-							}*/
-
-								//input.read(msg);
-								// receive(msg);
 								System.out.println("Read USB data");
 								int id = (int)(msg[0] & 0x000000ff);
 
