@@ -194,6 +194,15 @@
             android:layout_row="0"
             android:onClick="onMetaKeyClick"/>
 
+        <in.co.praveenkumar.bard.activities.BeagleButton
+            android:id="@+id/backSpace"
+            custom:keyCodeIndex="@integer/BACKSPACE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="BckSpc"
+            android:layout_column="13"
+            android:layout_row="0"
+            android:onClick="onMetaKeyClick"/>
 
 
         <in.co.praveenkumar.bard.activities.BeagleButton

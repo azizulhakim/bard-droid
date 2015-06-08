@@ -14,13 +14,14 @@
     <item name="F12" type="integer">69</item>
 
     <item name="ESC" type="integer">0</item>
-    <item name="TAB" type="integer">0</item>
+    <item name="TAB" type="integer">43</item>
 
     <item name="CTRL" type="integer">0</item>
-    <item name="ALT" type="integer">0</item>
+    <item name="ALT" type="integer">230</item>
+    <item name="WIN" type="integer">231</item>
 
     <item name="INSERT" type="integer">73</item>
-    <item name="DELETE" type="integer">99</item>
+    <item name="DELETE" type="integer">76</item>
 
     <item name="HOME" type="integer">74</item>
     <item name="END" type="integer">77</item>
@@ -30,8 +31,9 @@
 
     <item name="LEFT" type="integer">80</item>
     <item name="RIGHT" type="integer">79</item>
-    <item name="UP" type="integer">81</item>
-    <item name="DOWN" type="integer">82</item>
+    <item name="UP" type="integer">82</item>
+    <item name="DOWN" type="integer">81</item>
 
     <item name="ENTER" type="integer">88</item>
+    <item name="BACKSPACE" type="integer">42</item>
 </resources>
