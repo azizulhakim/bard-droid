@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
 
     private long oldTimeStamp = 0;
     private boolean isDragging = false;
+    private boolean shiftEnabled = false;
 
     // Activity Lifecycle
     @Override
@@ -302,6 +303,7 @@ public class MainActivity extends Activity {
             sendKeyboardData(res.getInteger(R.integer.ENTER));
         }
         if (event.getUnicodeChar() >= 'A' && event.getUnicodeChar() <= 'Z'){
+            shiftEnabled = true;
             sendKeyboardData(event.getUnicodeChar() - 'A' + 4);
         }
         else if(event.getUnicodeChar() >= 'a' && event.getUnicodeChar() <= 'z'){
@@ -321,7 +323,8 @@ public class MainActivity extends Activity {
                 }
             }
         }
-        //sendKeyboardData();
+
+        shiftEnabled = false;
 
         return super.onKeyUp(keyCode, event);
     }
@@ -350,6 +353,7 @@ public class MainActivity extends Activity {
     private void sendKeyboardData(int keyIndex){
         byte buffer[] = {0,0,0,0,0,0,0,0};
 
+        if (shiftEnabled) buffer[InputControl.METAKEY_INDEX] |= InputControl.SHIFT;
         buffer[InputControl.KEY_INDEX] = (byte)keyIndex;
 
         Toast.makeText(getApplicationContext(), "Receiver", Toast.LENGTH_SHORT).show();
