@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -67,8 +66,6 @@ public class MainActivity extends Activity {
     private LinearLayout activityLayout;
     private PopupWindow metaKeyPopUp;
     ImageView remoteScreen;
-    private Button leftButton;
-    private Button rightButton;
     private Button keyboardButton;
     private LinearLayout linearLayout;
     public static EditText editText;
@@ -79,7 +76,9 @@ public class MainActivity extends Activity {
 
     private long oldTimeStamp = 0;
     private boolean isDragging = false;
-    private boolean shiftEnabled = false;
+    private boolean shiftLocked = false;
+    private boolean capsLocked = false;
+    private boolean altLocked = false;
 
     // Activity Lifecycle
     @Override
@@ -88,8 +87,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         remoteScreen = (ImageView) findViewById(R.id.remote_screen);
 
-        leftButton = (Button)this.findViewById(R.id.leftButton);
-        rightButton = (Button)this.findViewById(R.id.rightButton);
         keyboardButton = (Button)this.findViewById(R.id.keyboardButton);
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         editText = (EditText)this.findViewById(R.id.editText);
@@ -262,23 +259,6 @@ public class MainActivity extends Activity {
     }
 
     private void setupButton() {
-        leftButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mouseSingleClick(InputControl.BTN_LEFT);
-
-            }
-        });
-
-        rightButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mouseSingleClick(InputControl.BTN_RIGHT);
-            }
-        });
-
         keyboardButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -296,35 +276,40 @@ public class MainActivity extends Activity {
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         // ToDo: Redisgn to make efficient
 
-        Toast.makeText(getApplicationContext(), "" + (char)event.getUnicodeChar(), Toast.LENGTH_SHORT).show();
+        int unicodeChar = event.getUnicodeChar();
+
+        shiftLocked = InputControl.isShiftKeyMappedKey(unicodeChar);
+        if (shiftLocked) unicodeChar = InputControl.getShiftKeyMappedKey(unicodeChar);
 
         if (keyCode == KeyEvent.KEYCODE_ENTER){
             Resources res = getResources();
             sendKeyboardData(res.getInteger(R.integer.ENTER));
         }
-        if (event.getUnicodeChar() >= 'A' && event.getUnicodeChar() <= 'Z'){
-            shiftEnabled = true;
-            sendKeyboardData(event.getUnicodeChar() - 'A' + 4);
+        if (unicodeChar >= 'A' && unicodeChar <= 'Z'){
+            shiftLocked = true;
+            sendKeyboardData(unicodeChar - 'A' + 4);
         }
-        else if(event.getUnicodeChar() >= 'a' && event.getUnicodeChar() <= 'z'){
-            sendKeyboardData(event.getUnicodeChar() - 'a' + 4);
+        else if(unicodeChar >= 'a' && unicodeChar <= 'z'){
+            sendKeyboardData(unicodeChar - 'a' + 4);
         }
-        else if(event.getUnicodeChar() >= '1' && event.getUnicodeChar() <= '9'){
-            sendKeyboardData(event.getUnicodeChar() - '0' + 30);
+        else if(unicodeChar >= '1' && unicodeChar <= '9'){
+            sendKeyboardData(unicodeChar - '1' + 30);
         }
-        else if(event.getUnicodeChar() == '0'){
-            sendKeyboardData(event.getUnicodeChar() - '0' + 39);
+        else if(unicodeChar == '0'){
+            sendKeyboardData(unicodeChar - '0' + 39);
         }
         else{
             for (int i=0;i<KEYCODES.length; i++){
-                if (KEYCODES[i] == event.getUnicodeChar()){
+                if (KEYCODES[i] == unicodeChar){
                     sendKeyboardData(i);
                     break;
                 }
             }
         }
 
-        shiftEnabled = false;
+        shiftLocked = false;
+        capsLocked = false;
+        altLocked = false;
 
         return super.onKeyUp(keyCode, event);
     }
@@ -353,19 +338,11 @@ public class MainActivity extends Activity {
     private void sendKeyboardData(int keyIndex){
         byte buffer[] = {0,0,0,0,0,0,0,0};
 
-        if (shiftEnabled) buffer[InputControl.METAKEY_INDEX] |= InputControl.SHIFT;
+        if (shiftLocked) buffer[InputControl.METAKEY_INDEX] |= InputControl.SHIFT;
         buffer[InputControl.KEY_INDEX] = (byte)keyIndex;
 
-        Toast.makeText(getApplicationContext(), "Receiver", Toast.LENGTH_SHORT).show();
-
         try{
-            try {
-                USBControl.mOutputStream.write(buffer);
-
-            } catch (Exception e1) {
-                Toast.makeText(getApplicationContext(), "Error:", Toast.LENGTH_SHORT).show();
-                e1.printStackTrace();
-            }
+            USBControl.mOutputStream.write(buffer);
         }
         catch (Exception ex){
             System.out.println("Error: " + ex.getMessage());

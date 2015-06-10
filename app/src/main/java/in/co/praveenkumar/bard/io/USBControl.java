@@ -1,19 +1,5 @@
 package in.co.praveenkumar.bard.io;
 
-import in.co.praveenkumar.bard.activities.MainActivity;
-import in.co.praveenkumar.bard.graphics.Frame;
-import in.co.praveenkumar.bard.utils.DebugDump;
-import in.co.praveenkumar.bard.utils.Globals;
-import in.co.praveenkumar.bard.utils.RLE;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.ByteBuffer;
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,7 +10,16 @@ import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
-import android.widget.Toast;
+
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import in.co.praveenkumar.bard.activities.MainActivity;
+import in.co.praveenkumar.bard.graphics.Frame;
+import in.co.praveenkumar.bard.utils.DebugDump;
+import in.co.praveenkumar.bard.utils.Globals;
+import in.co.praveenkumar.bard.utils.RLE;
 
 /**
  * Configures a USB accessory and its input/output streams.

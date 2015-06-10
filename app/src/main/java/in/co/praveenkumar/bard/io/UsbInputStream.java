@@ -6,6 +6,7 @@ import java.io.IOException;
 
 /**
  * Created by Azizul Hakim on 5/20/15.
+ * azizulfahim2002@gmail.com
  */
 public class UsbInputStream implements IUsbInputStream{
     private FileInputStream inputStream;

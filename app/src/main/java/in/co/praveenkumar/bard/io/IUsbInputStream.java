@@ -4,6 +4,7 @@ import java.io.IOException;
 
 /**
  * Created by Azizul Hakim on 5/20/15.
+ * azizulfahim2002@gmail.com
  */
 public interface IUsbInputStream {
     public int read() throws IOException;

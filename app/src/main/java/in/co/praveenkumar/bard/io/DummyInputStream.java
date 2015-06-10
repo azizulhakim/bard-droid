@@ -7,6 +7,7 @@ import in.co.praveenkumar.bard.utils.Globals;
 
 /**
  * Created by Azizul Hakim on 5/20/15.
+ * azizulfahim2002@gmail.com
  */
 public class DummyInputStream implements IUsbInputStream {
     private byte[] data = null;
