@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import in.co.praveenkumar.bard.activities.MainActivity;
 import in.co.praveenkumar.bard.graphics.Frame;
+import in.co.praveenkumar.bard.graphics.FrameSettings;
 import in.co.praveenkumar.bard.utils.DebugDump;
 import in.co.praveenkumar.bard.utils.Globals;
 import in.co.praveenkumar.bard.utils.RLE;
@@ -214,8 +215,8 @@ public abstract class USBControl extends Thread {
 									System.out.println("Page index : " + pageIndex);
 
 									// Update frame data
-									int framePos = pageIndex * 4096;
-									if ((framePos - (msg.length - 2)) <= Frame.FRAME_LENGTH) {
+									int framePos = pageIndex * 4 * FrameSettings.WIDTH;
+									if ((framePos - (msg.length - 4)) <= Frame.FRAME_LENGTH) {
 										Frame.frameBuffer.position(framePos);
 										Frame.frameBuffer.put(msg, 4, msg.length - 4);
 									}

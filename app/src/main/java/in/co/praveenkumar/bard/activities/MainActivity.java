@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
     private Button keyboardButton;
     private LinearLayout linearLayout;
     public static EditText editText;
-    Bitmap bitmap = Bitmap.createBitmap(1024, 768, Bitmap.Config.RGB_565);
+    Bitmap bitmap = Bitmap.createBitmap(FrameSettings.WIDTH, FrameSettings.HEIGHT, Bitmap.Config.RGB_565);
 
     // Handler, Threads
     private Handler UIHandler = new Handler();
