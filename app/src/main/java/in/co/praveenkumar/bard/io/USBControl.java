@@ -15,6 +15,7 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import in.co.praveenkumar.bard.R;
 import in.co.praveenkumar.bard.activities.MainActivity;
 import in.co.praveenkumar.bard.graphics.Frame;
 import in.co.praveenkumar.bard.graphics.FrameSettings;
@@ -92,6 +93,7 @@ public abstract class USBControl extends Thread {
 				: accessoryList[0]);
 
 		if (Globals.DEBUG){
+			Globals.AudioStream = context.getResources().openRawResource(R.raw.audio);
 			openAccessory(mAccessory);
 
 		}else {
@@ -205,7 +207,6 @@ public abstract class USBControl extends Thread {
 							while (input != null && input.read(msg) != -1
 									&& running) {
 
-								System.out.println("Read USB data");
 								int id = (int)(msg[0] & 0x000000ff);
 
 								if (id == Globals.DATA_VIDEO){

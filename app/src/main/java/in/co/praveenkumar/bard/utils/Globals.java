@@ -1,5 +1,7 @@
 package in.co.praveenkumar.bard.utils;
 
+import java.io.InputStream;
+
 import in.co.praveenkumar.bard.graphics.FrameSettings;
 
 public class Globals {
@@ -16,4 +18,6 @@ public class Globals {
 	public static final byte DROP_FRAME = 0x02;
 
 	public static final boolean DEBUG = false;
+
+	public static InputStream AudioStream = null;
 }

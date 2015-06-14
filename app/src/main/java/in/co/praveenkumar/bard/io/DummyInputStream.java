@@ -1,6 +1,11 @@
 package in.co.praveenkumar.bard.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Random;
 
 import in.co.praveenkumar.bard.graphics.FrameSettings;
 import in.co.praveenkumar.bard.utils.Globals;
@@ -18,6 +23,10 @@ public class DummyInputStream implements IUsbInputStream {
     private int framePos = 0;
     private int animPos = 0;
 
+    private Random randomGenerator;
+
+    //private BufferedInputStream audioReader = null;
+
     public DummyInputStream(){
         data = new byte[4096];
 
@@ -28,6 +37,11 @@ public class DummyInputStream implements IUsbInputStream {
             data[i] = (byte)0xe6;
             data[i+1] = 0x37;
         }
+
+        if (Globals.AudioStream.markSupported())
+            Globals.AudioStream.mark(0);
+
+        randomGenerator = new Random(10);
     }
 
     @Override
@@ -42,32 +56,44 @@ public class DummyInputStream implements IUsbInputStream {
 
         }
         else{
-            for (int i=0; i<buffer.length; i+=2){
-                buffer[i] = (byte)0xe6;
-                buffer[i+1] = (byte)0x37;
-            }
-            buffer[0] = (byte)Globals.DATA_VIDEO;
-            buffer[1] = (byte)framePos;
-            buffer[2] = (byte)(framePos >> 8);
+            int rand = randomGenerator.nextInt();
+
+            if (rand % 2 == 0) {
+                for (int i = 0; i < buffer.length; i += 2) {
+                    buffer[i] = (byte) 0xe6;
+                    buffer[i + 1] = (byte) 0x37;
+                }
+                buffer[0] = (byte) Globals.DATA_VIDEO;
+                buffer[1] = (byte) framePos;
+                buffer[2] = (byte) (framePos >> 8);
 
 
-            if (framePos >= FrameSettings.HEIGHT / 4 - 10 && framePos <= FrameSettings.HEIGHT/4 + 10){
-                for (int i=0; i<40; i++){
-                    buffer[animPos + i] = 0;
-                    buffer[FrameSettings.WIDTH / 2 + animPos + i] = 0;
-                    buffer[FrameSettings.WIDTH + animPos + i] = 0;
+                if (framePos >= FrameSettings.HEIGHT / 4 - 10 && framePos <= FrameSettings.HEIGHT / 4 + 10) {
+                    for (int i = 0; i < 40; i++) {
+                        buffer[animPos + i] = 0;
+                        buffer[FrameSettings.WIDTH / 2 + animPos + i] = 0;
+                        buffer[FrameSettings.WIDTH + animPos + i] = 0;
+                    }
+
+                    animPos = (animPos + 1) % (FrameSettings.WIDTH);
                 }
 
-                animPos = (animPos + 1) % (FrameSettings.WIDTH);
+                framePos = (framePos + 1) % (FrameSettings.HEIGHT / 2);
+
+            }else {
+                int count = Globals.AudioStream.read(buffer);
+                if (count < buffer.length)
+                    Globals.AudioStream.reset();
+
+                buffer[0] = (byte) Globals.DATA_AUDIO;
+
+                try {
+                    Thread.sleep(0, 500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-            framePos = (framePos + 1) % (FrameSettings.HEIGHT / 2);
-
-            try {
-                Thread.sleep(0, 500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             return buffer.length;
         }
     }
