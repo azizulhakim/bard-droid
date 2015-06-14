@@ -49,7 +49,7 @@ public class RLE {
         int j = 0;
         for (int i=pos; i<end; i+=3){
             int count = (int)data[i+2] & 0xff;
-            while(count > 0){
+            while(count > 0 && j+2 < Globals.DATA_SIZE){
                 ret[j++] = data[i];
                 ret[j++] = data[i+1];
                 count--;

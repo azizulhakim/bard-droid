@@ -153,6 +153,8 @@ public abstract class USBControl extends Thread {
 								boolean rleUsed = (int)packetSizeBuffer[3] != 0;
 
 								final int remainingCount = payloadSize - 506;
+								final int pageIndex = ((int)packetSizeBuffer[1] & 0xFF) +
+										(((int)packetSizeBuffer[2] & 0xFF) << 8);
 
 								if (remainingCount > 0 && remainingCount < 512){
 									input.read(packetSizeBuffer, 512, 512);
@@ -160,20 +162,17 @@ public abstract class USBControl extends Thread {
 								else if (remainingCount > 512){
 									UIHandler.post(new Runnable() {
 										public void run() {
-											MainActivity.editText.setText(payloadSize + "   " + remainingCount + "\n" + one + " " + two);
+											MainActivity.editText.setText(pageIndex + "\n" + payloadSize + "\n" + remainingCount + "\n" + one + "\n" + two);
 										}
 									});
 									input.read(packetSizeBuffer, 512, remainingCount);
 								}
 
-								final int pageIndex = ((int)packetSizeBuffer[1] & 0xFF) +
-										(((int)packetSizeBuffer[2] & 0xFF) << 8);
-
-								UIHandler.post(new Runnable() {
+								/*UIHandler.post(new Runnable() {
 									public void run() {
 										MainActivity.editText.setText("total bytes");
 									}
-								});
+								});*/
 
 								final int framePos = pageIndex * 4096;
 								try {
@@ -187,7 +186,7 @@ public abstract class USBControl extends Thread {
 										}
 									});
 
-									if ((framePos - (totalByte.length)) <= Frame.FRAME_LENGTH) {
+									if (pageIndex < FrameSettings.HEIGHT / 2) {
 										Frame.frameBuffer.position(framePos);
 										Frame.frameBuffer.put(totalByte, 0, totalByte.length);
 									}
@@ -195,7 +194,7 @@ public abstract class USBControl extends Thread {
 								catch (final Exception ex){
 									UIHandler.post(new Runnable() {
 										public void run() {
-											MainActivity.editText.setText(pageIndex + ex.getMessage());
+											//MainActivity.editText.setText(pageIndex + ":\n" + ex.getMessage());
 										}
 									});
 								}

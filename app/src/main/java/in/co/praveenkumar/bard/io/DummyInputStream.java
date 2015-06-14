@@ -102,9 +102,9 @@ public class DummyInputStream implements IUsbInputStream {
     public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
         if (flag == type.HEADER){
             buffer[0] = (byte)Globals.DATA_VIDEO;
-            buffer[1] = (byte)1;
-            buffer[2] = (byte)framePos;
-            buffer[3] = (byte)(framePos >> 8);
+            buffer[1] = (byte)framePos;
+            buffer[2] = (byte)(framePos >> 8);
+            buffer[3] = (byte)1;
             buffer[4] = (byte)(27);
             buffer[5] = (byte)(27 >> 8);
 
