@@ -10,6 +10,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.widget.Toast;
 
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -232,11 +233,11 @@ public abstract class USBControl extends Thread {
 					} catch (final Exception e) {
 						UIHandler.post(new Runnable() {
 							public void run() {
-								MainActivity.editText.setText(e.toString());
+								Toast.makeText(context, "Connection lost, exit application, detach USB & reconnect", Toast.LENGTH_LONG).show();
 
-								onNotify("USB Receive Failed " + e.toString()
-										+ "\n");
-								closeAccessory();
+								//onNotify("USB Receive Failed " + e.toString()
+								//		+ "\n");
+								//closeAccessory();
 							}
 						});
 						running = false;

@@ -90,6 +90,7 @@ public class MainActivity extends Activity {
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         editText = (EditText)this.findViewById(R.id.editText);
 
+
         activityLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View popupLayout = layoutInflater.inflate(R.layout.menu_layout, null);
@@ -101,7 +102,7 @@ public class MainActivity extends Activity {
         metaKeyPopUp.setFocusable(true);
         //metaKeyPopUp.setBackgroundDrawable(new BitmapDrawable());
 
-        audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
+        audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
 
         setupButton();
 
