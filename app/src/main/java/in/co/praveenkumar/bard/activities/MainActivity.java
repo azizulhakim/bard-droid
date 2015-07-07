@@ -102,7 +102,7 @@ public class MainActivity extends Activity {
         metaKeyPopUp.setFocusable(true);
         //metaKeyPopUp.setBackgroundDrawable(new BitmapDrawable());
 
-        audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
+        audioTrack = new  AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_BUFFER_SIZE, AudioTrack.MODE_STREAM);
 
         setupButton();
 
