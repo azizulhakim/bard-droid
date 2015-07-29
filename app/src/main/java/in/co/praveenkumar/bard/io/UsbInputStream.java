@@ -35,4 +35,9 @@ public class UsbInputStream implements IUsbInputStream{
 
         return i;
     }
+
+    @Override
+    public void close() throws IOException{
+        inputStream.close();
+    }
 }

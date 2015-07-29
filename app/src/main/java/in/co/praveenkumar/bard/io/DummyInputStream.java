@@ -123,4 +123,8 @@ public class DummyInputStream implements IUsbInputStream {
 
         return 33;
     }
+
+    @Override
+    public void close() throws IOException{
+    }
 }

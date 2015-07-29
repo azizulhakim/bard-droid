@@ -10,4 +10,5 @@ public interface IUsbInputStream {
     public int read() throws IOException;
     public int read(byte[] buffer) throws IOException;
     public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException;
+    public void close() throws IOException;
 }

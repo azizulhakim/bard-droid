@@ -237,7 +237,11 @@ public abstract class USBControl extends Thread {
 
 								//onNotify("USB Receive Failed " + e.toString()
 								//		+ "\n");
-								//closeAccessory();
+								closeAccessory();
+								Intent intent = new Intent(Intent.ACTION_MAIN);
+								intent.addCategory(Intent.CATEGORY_HOME);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								context.startActivity(intent);
 							}
 						});
 						running = false;
@@ -277,15 +281,19 @@ public abstract class USBControl extends Thread {
 	public void closeAccessory() {
 
 		// halt i/o
-		controlSender.getLooper().quit();
+		//controlSender.getLooper().quit();
 		controlListener.interrupt();
 
 		try {
 			if (mFileDescriptor != null) {
+				input.close();
+				mOutputStream.close();
 				mFileDescriptor.close();
 			}
 		} catch (IOException e) {
 		} finally {
+			input = null;
+			mOutputStream = null;
 			mFileDescriptor = null;
 			mAccessory = null;
 		}
