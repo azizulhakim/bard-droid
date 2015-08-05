@@ -20,15 +20,11 @@
                 android:layout_height="wrap_content"
                 android:text="Keyboard"/>
             <EditText android:id="@+id/editText"
-                android:editable="false"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox android:id="@+id/dropframeCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dropFrame"
-                android:onClick="onCheckboxClicked"/>
+                android:text=" "
+                android:editable="true"
+                android:inputType="textNoSuggestions"
+                android:layout_width="5dp"
+                android:layout_height="5dp" />
 
             <Button android:id="@+id/popupButton"
                 android:layout_width="wrap_content"
@@ -36,8 +32,16 @@
                 android:text="MetaKeys"
                 android:onClick="onCustomClick"/>
 
+            <CheckBox android:id="@+id/dropframeCheckbox"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dropFrame"
+                android:onClick="onCheckboxClicked"/>
+
             <in.co.praveenkumar.bard.activities.BeagleButton
                 custom:keyCodeIndex="0"
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Test"

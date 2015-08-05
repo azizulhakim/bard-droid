@@ -20,9 +20,10 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -89,7 +90,7 @@ public class MainActivity extends Activity {
         keyboardButton = (Button)this.findViewById(R.id.keyboardButton);
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         editText = (EditText)this.findViewById(R.id.editText);
-
+        editText.addTextChangedListener(keyboardWatcher);
 
         activityLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -266,12 +267,76 @@ public class MainActivity extends Activity {
 
                 InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
-                //sendKeyboardData(testKeyCodeIndex++);
-
+                editText.setFocusable(true);
+                editText.setSelection(editText.getText().length());
             }
         });
     }
 
+    private final TextWatcher keyboardWatcher = new TextWatcher() {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        public void afterTextChanged(Editable s) {
+            editText.removeTextChangedListener(this);
+            String str = editText.getText().toString();
+
+            if (str.equals("")){
+                Resources res = getResources();
+                sendKeyboardData(res.getInteger(R.integer.BACKSPACE));
+            }
+            else if (s.charAt(s.length() - 1) == '\n'){
+                Resources res = getResources();
+                sendKeyboardData(res.getInteger(R.integer.ENTER));
+            }
+            else{
+                System.out.println(s.charAt(s.length() - 1));
+                manageUnicodeChar((int) s.charAt(s.length() - 1));
+            }
+
+            editText.setText(" ");
+            editText.setSelection(editText.getText().length());
+            editText.addTextChangedListener(this);
+        }
+    };
+
+    public void manageUnicodeChar(int unicodeChar){
+        shiftLocked = InputControl.isShiftKeyMappedKey(unicodeChar);
+        if (shiftLocked) unicodeChar = InputControl.getShiftKeyMappedKey(unicodeChar);
+
+
+        if (unicodeChar >= 'A' && unicodeChar <= 'Z'){
+            shiftLocked = true;
+            sendKeyboardData(unicodeChar - 'A' + 4);
+        }
+        else if(unicodeChar >= 'a' && unicodeChar <= 'z'){
+            sendKeyboardData(unicodeChar - 'a' + 4);
+        }
+        else if(unicodeChar >= '1' && unicodeChar <= '9'){
+            sendKeyboardData(unicodeChar - '1' + 30);
+        }
+        else if(unicodeChar == '0'){
+            sendKeyboardData(unicodeChar - '0' + 39);
+        }
+        else{
+            for (int i=0;i<KEYCODES.length; i++){
+                if (KEYCODES[i] == unicodeChar){
+                    sendKeyboardData(i);
+                    break;
+                }
+            }
+        }
+
+        shiftLocked = false;
+        capsLocked = false;
+        altLocked = false;
+    }
+/*
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         // ToDo: Redisgn to make efficient
@@ -319,6 +384,7 @@ public class MainActivity extends Activity {
         // TODO Auto-generated method stub
         return super.onKeyDown(keyCode, event);
     }
+*/
 
     public void onCustomClick(View view) {
         int x = activityLayout.getWidth() - metaKeyPopUp.getWidth();
