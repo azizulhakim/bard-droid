@@ -22,7 +22,7 @@
             <EditText android:id="@+id/editText"
                 android:text=" "
                 android:editable="true"
-                android:inputType="textNoSuggestions"
+                android:inputType="textFilter|textMultiLine|textNoSuggestions"
                 android:layout_width="5dp"
                 android:layout_height="5dp" />
 
