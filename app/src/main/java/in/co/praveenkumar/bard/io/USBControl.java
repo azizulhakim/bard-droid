@@ -219,7 +219,7 @@ public abstract class USBControl extends Thread {
 									int framePos = pageIndex * 4 * FrameSettings.WIDTH;
 									if ((framePos - (msg.length - 4)) <= Frame.FRAME_LENGTH) {
 										Frame.frameBuffer.position(framePos);
-										Frame.frameBuffer.put(msg, 4, msg.length - 4);
+										Frame.frameBuffer.put(msg, Globals.DATA_HEADER_SIZE, msg.length - Globals.DATA_HEADER_SIZE);
 									}
 								}
 								else if (id == Globals.DATA_AUDIO){
