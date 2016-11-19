@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import in.co.praveenkumar.bard.R;
 import in.co.praveenkumar.bard.activities.MainActivity;
@@ -213,13 +214,25 @@ public abstract class USBControl extends Thread {
 									int pageIndex = (int) (msg[1] & 0x0000000ff)
 											+ (int) (msg[2] << 8 & 0x0000ff00);
 
-									System.out.println("Page index : " + pageIndex);
+									//System.out.println("Page index : " + pageIndex);
 
 									// Update frame data
 									int framePos = pageIndex * 4 * FrameSettings.WIDTH;
+									if (pageIndex > 382){
+										System.out.println();
+									}
+
 									if ((framePos - (msg.length - 4)) <= Frame.FRAME_LENGTH) {
-										Frame.frameBuffer.position(framePos);
-										Frame.frameBuffer.put(msg, Globals.DATA_HEADER_SIZE, msg.length - Globals.DATA_HEADER_SIZE);
+										synchronized (Frame.frameBuffer) {
+											try {
+												Frame.frameBuffer.position(framePos);
+												Frame.frameBuffer.put(msg, Globals.DATA_HEADER_SIZE, msg.length - Globals.DATA_HEADER_SIZE);
+
+											} catch (Exception ex) {
+												System.out.println("Error writing to framebuffer");
+												ex.printStackTrace();
+											}
+										}
 									}
 								}
 								else if (id == Globals.DATA_AUDIO){
@@ -231,6 +244,7 @@ public abstract class USBControl extends Thread {
 						}
 
 					} catch (final Exception e) {
+						e.printStackTrace();
 						UIHandler.post(new Runnable() {
 							public void run() {
 								Toast.makeText(context, "Connection lost, exit application, detach USB & reconnect", Toast.LENGTH_LONG).show();

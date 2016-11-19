@@ -35,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
     final String DEBUG_TAG = "BARD";
@@ -69,6 +70,7 @@ public class MainActivity extends Activity {
     private Button keyboardButton;
     private LinearLayout linearLayout;
     public static EditText editText;
+    public static TextView debugText;
     Bitmap bitmap = Bitmap.createBitmap(FrameSettings.WIDTH, FrameSettings.HEIGHT, Bitmap.Config.RGB_565);
 
     // Handler, Threads
@@ -91,6 +93,9 @@ public class MainActivity extends Activity {
         linearLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         editText = (EditText)this.findViewById(R.id.editText);
         editText.addTextChangedListener(keyboardWatcher);
+
+        debugText = (TextView)this.findViewById(R.id.debugText);
+        debugText.setText("Debug Log");
 
         activityLayout = (LinearLayout)this.findViewById(R.id.linearLayout);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -148,7 +153,7 @@ public class MainActivity extends Activity {
                     try {
                         byte[] data = MainActivity.audioData.take();
                         if (data != null){
-                            System.out.println("Playing: " + count);
+                            //System.out.println("Playing: " + count);
                             audioTrack.write(data, offset, data.length);
                             offset += data.length;
                             offset %= AUDIO_BUFFER_SIZE;
@@ -483,15 +488,16 @@ public class MainActivity extends Activity {
 		 * reading outside the buffer range - A possible race condition with
 		 * position being of Frame being set from reader thread.
 		 */
-        try {
-            Frame.frameBuffer.position(0);
-            bitmap.copyPixelsFromBuffer(Frame.frameBuffer);
-            remoteScreen.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Exception with copyPixelsFromBuffer");
+        synchronized (Frame.frameBuffer) {
+            try {
+                Frame.frameBuffer.position(0);
+                bitmap.copyPixelsFromBuffer(Frame.frameBuffer);
+                remoteScreen.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Exception with copyPixelsFromBuffer");
+            }
         }
-
     }
 
     private void setupUSB() {
